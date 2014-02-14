@@ -6,11 +6,18 @@ function login($username, $password) {
 	static $stmt;
 	if (!isset($stmt)) {
 		require_once 'MySQLConnector.php';
-		$stmt = get_mysql_connection()->prepare("SELECT id, username, passwdhash FROM users WHERE namehash = UNHEX(?) LIMIT 1");	
+		$mysqli = get_mysql_connection();
+		if (!$stmt = $mysqli->prepare("SELECT id, username, password_hash FROM users WHERE username_hash = UNHEX(?) LIMIT 1")) {
+			error_log("(Error #$mysqli->errno): $mysqli->error");
+			die("(Error #$mysqli->errno): $mysqli->error");
+		}
 	}
 	$stmt->bind_param("s", $userhash);
 	$userhash = hash(FAST_ALGO, $username);
-	$stmt->execute();
+	if (!$stmt->execute()) {
+		error_log("(Error #$stmt->errno): $stmt->error");
+		die("(Error #$stmt->errno): $stmt->error");
+	}
 	$stmt->bind_result($id, $user, $passwdhash);
 	if ($stmt->fetch() && password_verify($password, $passwdhash)) {
 		$_SESSION["uid"] = $id;
@@ -31,14 +38,21 @@ function create_pbp_user($username, $password) {
 	static $stmt;
 	if (!isset($stmt)) {
 		require_once 'MySQLConnector.php';
-		$stmt = get_mysql_connection()->prepare("INSERT INTO users (username, namehash, passwdhash) VALUES (?, UNHEX(?), ?)");
+		$mysqli = get_mysql_connection();
+		if (!$stmt = $mysqli->prepare("INSERT INTO users (username, username_hash, password_hash) VALUES (?, UNHEX(?), ?)")) {
+			error_log("(Error #$mysqli->errno): $mysqli->error");
+			die("(Error #$mysqli->errno): $mysqli->error");
+		}
 	}
 	$stmt->bind_param("sss", $username, $userhash, $passwdhash);
 	$userhash = hash(FAST_ALGO, $username);
 	$passwdhash = password_hash($password, PASSWORD_DEFAULT);
-	$stmt->execute();
+	if (!$stmt->execute() && $stmt->errno != 1062) { //1062 is the error for duplicate value
+		error_log("(Error #$stmt->errno): $stmt->error");
+		die("(Error #$stmt->errno): $stmt->error");
+	}
 	return $stmt->errno == 0;	// An error means we tried
-								// to insert a namehash that already existed
+								// to insert a username hash that already existed
 }								// (or have overflowed id) so return false
 
 function logout() {
