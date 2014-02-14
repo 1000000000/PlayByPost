@@ -64,15 +64,25 @@
 		require_once 'MySQLConnector.php';
 		$mysqli = get_mysql_connection();
 		$res = $mysqli->query("
-			SELECT game_name, char_name, name, activity FROM (
-				SELECT games.name AS game_name, gm AS gmid, characters.name AS char_name, activity
-				FROM characters
-				JOIN games ON (
-					characters.userid = " . $_SESSION["uid"] . "
-					AND gameid = games.id
-				) ORDER BY activity DESC
-			) AS t JOIN characters ON (id = gmid)
+			SELECT games.name AS game_name, characters.name AS char_name,
+			gms.name AS gm_name, games.last_activity AS activity
+			FROM characters AS gms
+			JOIN (
+				games
+				JOIN (
+					character_game_map
+					JOIN (
+						characters
+						JOIN users ON ( users.id = " . $_SESSION["uid"] . "
+						AND users.id = characters.user_id )
+					) ON ( characters.id = character_game_map.character_id )
+				) ON ( character_game_map.game_id = games.id )
+			) ON ( games.gm_id = gms.id ) ORDER BY games.last_activity DESC;
 		");
+		if(!$res) {
+			error_log("(Error #$mysqli->errno): $mysqli->error");
+			die("(Error #$mysqli->errno): $mysqli->error");
+		}
 		if ($res->num_rows < 1) {
 			println("<h3>You are not part of any games!</h3>");
 		} else {
@@ -80,9 +90,17 @@
 			println("<tr>", 4);
 			println("<th>Name</th>", 5);
 			println("<th>Character</th>", 5);
+			println("<th>GM</th>");
 			println("<th>Last Activity</th>", 5);
-			
 			println("</tr>", 4);
+			while ($row = $res->fetch_assoc()) {
+				println("<tr>", 4);
+				println("<td>" . $row["game_name"] . "</td>", 5);
+				println("<td>" . $row["char_name"] . "</td>", 5);
+				println("<td>" . $row["gm_name"] . "</td>", 5);
+				println("<td>" . $row["activity"] . "</td>", 5);
+				println("</tr>", 4);
+			}
 			println("</table>", 3);
 		}
 	}

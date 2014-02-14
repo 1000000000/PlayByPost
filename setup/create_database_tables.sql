@@ -1,11 +1,6 @@
 -- phpMyAdmin SQL Dump
 -- version 3.3.0
 -- http://www.phpmyadmin.net
---
--- Host: localhost
--- Generation Time: Feb 13, 2014 at 06:15 AM
--- Server version: 5.5.35
--- PHP Version: 5.5.3-1ubuntu2.1
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
@@ -34,11 +29,6 @@ CREATE TABLE IF NOT EXISTS `characters` (
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='super class for all characters (including gms)' AUTO_INCREMENT=1 ;
 
---
--- Dumping data for table `characters`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -49,11 +39,6 @@ CREATE TABLE IF NOT EXISTS `characters_gm` (
   `id` mediumint(8) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Dumping data for table `characters_gm`
---
-
 
 -- --------------------------------------------------------
 
@@ -66,12 +51,7 @@ CREATE TABLE IF NOT EXISTS `character_game_map` (
   `game_id` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`character_id`),
   KEY `game_id` (`game_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Fixes a problem with circular references and allows gameless characters';
-
---
--- Dumping data for table `character_game_map`
---
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Fixes a problem with circular references and allows gameless characters';
 
 -- --------------------------------------------------------
 
@@ -86,13 +66,9 @@ CREATE TABLE IF NOT EXISTS `games` (
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `last_activity` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `gm_id` (`gm_id`)
+  UNIQUE KEY `gm_id` (`gm_id`),
+  KEY `last_activity` (`last_activity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `games`
---
-
 
 -- --------------------------------------------------------
 
@@ -110,14 +86,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `username_hash` (`username_hash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Email and last seen may be added (email maybe in a separate table)' AUTO_INCREMENT=1 ;
 
---
--- Dumping data for table `users`
---
-
-
---
--- Constraints for dumped tables
---
 
 --
 -- Constraints for table `characters`
@@ -135,8 +103,8 @@ ALTER TABLE `characters_gm`
 -- Constraints for table `character_game_map`
 --
 ALTER TABLE `character_game_map`
-  ADD CONSTRAINT `character_game_map_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `character_game_map_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `character_game_map_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `character_game_map_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `games`

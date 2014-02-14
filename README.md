@@ -21,10 +21,10 @@ that needs to be updated and run the create_database_tables.sql script.
 * Basic look for website
 * Creating an account
 * Database structure for users, characters, and games
+* Page for list of games
 
 
 ####Short Term Plans:
-* Page for list of games
 * Page for list of characters
 * Page for user profile
 * Implement forum
