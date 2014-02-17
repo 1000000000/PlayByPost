@@ -61,11 +61,12 @@
 	}
 
 	function create_games_body() {
-		require_once 'MySQLConnector.php';
+		require_once "MySQLConnector.php";
 		$mysqli = get_mysql_connection();
 		$res = $mysqli->query("
 			SELECT games.name AS game_name, characters.name AS char_name,
-			gms.name AS gm_name, games.last_activity AS activity
+			gms.name AS gm_name,
+			DATE_FORMAT(games.last_activity, \"%M %d, %Y, %r\") AS activity
 			FROM characters AS gms
 			JOIN (
 				games
@@ -86,11 +87,11 @@
 		if ($res->num_rows < 1) {
 			println("<h3>You are not part of any games!</h3>");
 		} else {
-			println("<table>");
+			println("<table id=\"games\">");
 			println("<tr>", 4);
 			println("<th>Name</th>", 5);
 			println("<th>Character</th>", 5);
-			println("<th>GM</th>");
+			println("<th>GM</th>", 5);
 			println("<th>Last Activity</th>", 5);
 			println("</tr>", 4);
 			while ($row = $res->fetch_assoc()) {
