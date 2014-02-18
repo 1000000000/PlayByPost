@@ -87,7 +87,7 @@
 		if ($res->num_rows < 1) {
 			println("<h3>You are not part of any games!</h3>");
 		} else {
-			println("<table id=\"games\">");
+			println("<table class=\"visible\">");
 			println("<tr>", 4);
 			println("<th>Name</th>", 5);
 			println("<th>Character</th>", 5);
@@ -107,7 +107,40 @@
 	}
 	
 	function create_chars_body() {
-		
+		require_once 'MySQLConnector.php';
+		$mysqli = get_mysql_connection();
+		$res = $mysqli->query("
+			SELECT characters.name AS name, games.name AS game
+			FROM games
+			RIGHT JOIN (
+				character_game_map
+				RIGHT JOIN (
+					characters
+					JOIN users ON ( users.id = " . $_SESSION["uid"] . "
+					AND users.id = characters.user_id )
+				) ON ( characters.id = character_game_map.character_id )
+			) ON ( character_game_map.game_id = games.id )
+		");
+		if(!$res) {
+			error_log("(Error #$mysqli->errno): $mysqli->error");
+			die("(Error #$mysqli->errno): $mysqli->error");
+		}
+		if ($res->num_rows < 1) {
+			println("<h3>You do not have any characters!</h3>");
+		} else {
+			println("<table class=\"visible\">");
+			println("<tr>", 4);
+			println("<th>Name</th>", 5);
+			println("<th>Game</th>", 5);
+			println("</tr>", 4);
+			while ($row = $res->fetch_assoc()) {
+				println("<tr>", 4);
+				println("<td>" . $row["name"] . "</td>", 5);
+				println("<td>" . ($row["game"] == NULL ? "None" : $row["game"]) . "</td>", 5);
+				println("</tr>", 4);
+			}
+			println("</table>", 3);
+		}
 	}
 	
 	function create_profile_body() {

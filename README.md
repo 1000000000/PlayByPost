@@ -22,10 +22,10 @@ that needs to be updated and run the create_database_tables.sql script.
 * Creating an account
 * Database structure for users, characters, and games
 * Page for list of games
+* Page for list of characters
 
 
 ####Short Term Plans:
-* Page for list of characters
 * Page for user profile
 * Implement forum
 * Create special tag to show text to only particular people in post
