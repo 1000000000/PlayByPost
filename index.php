@@ -144,7 +144,7 @@
 	}
 	
 	function create_profile_body() {
-		
+		println("Under construction...");
 	}
 
 ?>
