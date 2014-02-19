@@ -29,6 +29,7 @@ that needs to be updated and run the create_database_tables.sql script.
 * Page for user profile
 * Implement forum
 * Create special tag to show text to only particular people in post
+* Create special tag for d20 die roll
 
 ####Long Term Plans:
 * Creating games
