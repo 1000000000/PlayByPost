@@ -6,7 +6,7 @@
 	if (isset($_POST["username"]) && isset($_POST["password"])) {
 		login($_POST["username"], $_POST["password"]);
 	}
-	if (isset($_SESSION["username"])) {
+	if (isset($_SESSION["username"])) { // uid can be 0 when user is not logged in so I check the username
 		header("Location: index.php");
 		exit;
 	}

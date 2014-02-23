@@ -97,7 +97,8 @@
 		}
 		if ($res->num_rows < 1) { // if no rows are returned
 			println("<h3>You are not part of any games!</h3>");
-		} else {
+		} else { // create table for games
+			// opens the table tag and creates table header
 			println("<table class=\"bordered\">"); // class bordered is for tables with visible borders
 			println("<tr>", 4);
 			println("<th>Name</th>", 5);
@@ -105,6 +106,7 @@
 			println("<th>GM</th>", 5);
 			println("<th>Last Activity</th>", 5);
 			println("</tr>", 4);
+			// for all of the rows fetched from the database add a row to the HTML table
 			while ($row = $res->fetch_assoc()) {
 				println("<tr>", 4);
 				println("<td>" . $row["game_name"] . "</td>", 5);

@@ -5,16 +5,21 @@
 	session_start();
 	if (isset($_POST["username"]) && isset($_POST["password"]) && isset($_POST["password2"])) {
 		if (!(strlen($_POST["username"]) > 0 && strlen($_POST["password"]) > 0 && strlen($_POST["password2"])) > 0) {
+			// if any of the form's fields are blank
 			$GLOBALS["err"] = "All the fields must be filled";
 		} elseif (!ctype_alnum(str_replace(array("-", "_"), "", $_POST["username"]))) {
+			// if the username field have any characters not it [A-Za-z0-9_-]
 			$GLOBALS["err"] = "Username may only contain alphanumeric characters, \"-\" and \"_\"";
 		} elseif (strlen($_POST["username"]) > 20) {
 			$GLOBALS["err"] = "Username exceeds 20 character limit";
-		} elseif (!create_pbp_user($_POST["username"], $_POST["password"])) {
-			$GLOBALS["err"] = "Username already exists";
 		} elseif ($_POST["password"] != $_POST["password2"]) {
 			$GLOBALS["err"] = "Passwords do not match";
+		} elseif (!create_pbp_user($_POST["username"], $_POST["password"])) {
+			// create_pbp_user() returns false only when there is a duplicate user or when the number
+			// of characters exceeds 20 (but that has already been checked for)
+			$GLOBALS["err"] = "Username already exists";
 		} else {
+			// if everything goes smoothly then log in with the newly created user
 			login($_POST["username"], $_POST["password"]);
 			header("Location: index.php");
 			exit;

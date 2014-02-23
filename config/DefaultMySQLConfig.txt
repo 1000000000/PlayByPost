@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * For information on what these config options do check
+ * http://us1.php.net/manual/en/mysqli.construct.php
+ */
 $MYSQL_HOST = "localhost";
 $MYSQL_USERNAME = "root";
 $MYSQL_PASSWORD = "";

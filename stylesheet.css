@@ -79,16 +79,16 @@ body > * {
 
 
 
-table.visible {
+table.bordered {
 	border-collapse: collapse;
 	border: 2px solid black;
 }
 
-.visible tr:first-child {
+table.bordered > tr:first-child {
 	border: 2px solid black;
 }
 
-.visible th, .visible td {
+table.bordered th, table.bordered td {
 	border: 1px solid black;
 	padding: 0.15em 0.5em;
 	text-align: center;
