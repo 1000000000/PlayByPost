@@ -6,7 +6,8 @@ This is a simple play by post forum for tabletop roleplaying games.
 This is primarily meant to be a fun way for me to learn PHP and MySQL.  
 
 To create the tables necessary for the database run
-the create_database_tables.sql script in the setup folder.  
+the create_database_tables.sql script in the setup folder.
+Note that create_databse_tables.sql will not overwrite any existing tables!  
 
 To clear the database of existing tables (so that the tables can be updated)
 run the drop_database_tables.sql script in the setup folder.  
