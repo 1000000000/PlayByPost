@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'not really sure what I''m going to use this for yet',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='super class for all characters (including gms)' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='super class for all characters (including gms)' AUTO_INCREMENT=8 ;
 
 -- --------------------------------------------------------
 
@@ -68,6 +68,23 @@ CREATE TABLE IF NOT EXISTS `games` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `gm_id` (`gm_id`),
   KEY `last_activity` (`last_activity`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `posts`
+--
+
+CREATE TABLE IF NOT EXISTS `posts` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `game_id` smallint(5) unsigned NOT NULL,
+  `character_id` mediumint(8) unsigned NOT NULL COMMENT 'I should deal with the possibility that a user deletes a character sometime',
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `content` text COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `game_id` (`game_id`,`character_id`,`created`),
+  KEY `character_id` (`character_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -84,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `joined` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username_hash` (`username_hash`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Email and last seen may be added (email maybe in a separate table)' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Email and last seen may be added (email maybe in a separate table)' AUTO_INCREMENT=7 ;
 
 
 --
@@ -111,3 +128,10 @@ ALTER TABLE `character_game_map`
 --
 ALTER TABLE `games`
   ADD CONSTRAINT `games_ibfk_1` FOREIGN KEY (`gm_id`) REFERENCES `characters_gm` (`id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `posts`
+--
+ALTER TABLE `posts`
+  ADD CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `posts_ibfk_2` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`) ON UPDATE CASCADE;
