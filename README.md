@@ -24,10 +24,12 @@ that needs to be updated and run the create_database_tables.sql script.
 * Database structure for users, characters, and games
 * Page for list of games
 * Page for list of characters
+* Documentation of all PHP (to a reasonable extent)
 
 
 ####Short Term Plans:
 * Implement forum
+* Document MySQL queries
 * Create special tag to show text to only particular people in post
 * Create special tag for d20 die roll
 
