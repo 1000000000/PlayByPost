@@ -16,10 +16,41 @@
 			$GLOBALS["page_title"] = "Characters";
 			$GLOBALS["create_page"] = "create_chars_body"; // sets function to create page body
 			break;
-		case "profile": // page for
+		case "profile": // page for user profile (not done)
 			$GLOBALS["page_title"] = "Profile";
 			$GLOBALS["create_page"] = "create_profile_body";
 			break;
+		case "game": // this is the case for a user's list of games or a the forum for a game
+			if (isset($_GET["gameid"]) && $gameid = intval($_GET["gameid"]) > 0) {
+				$mysqli = get_mysql_connection();
+				$res = $mysqli->query("
+					SELECT COUNT(*)
+					FROM characters
+					JOIN (
+						character_game_map
+						JOIN games ON ( games.id = $gameid
+						AND games.id = character_game_map.game_id)
+					) ON ( character_game_map.character_id = characters.id)
+					WHERE characters.user_id = " . $_SESSION["uid"]
+				);
+				if (!$res) { // if there was an error
+					error_log("(Error #$mysqli->errno): $mysqli->error");
+					die("(Error #$mysqli->errno): $mysqli->error");
+				}
+				$row = $res->fetch_row();
+				if ($row[0] > 0) {
+					$res = $mysqli->query("
+						SELECT characters.name AS char_name, users.username AS username,
+						posts.created AS posted, posts.content AS content
+						FROM users
+						JOIN (
+							characters JOIN posts
+							ON ( posts.game_id = $gameid  AND characters.id = posts.character_id)
+						) ON ( users.id = characters.user_id )
+						ORDER BY games.last_activity DESC
+					");
+				}
+			} // we want to go to the games page if the gameid GET variable does not exist or is invalid
 		default: //includes "" so index.php will go here
 			// the default is to show the list of games the user is in
 			$GLOBALS["page_title"] = "Games";
@@ -89,7 +120,7 @@
 						AND users.id = characters.user_id )
 					) ON ( characters.id = character_game_map.character_id )
 				) ON ( character_game_map.game_id = games.id )
-			) ON ( games.gm_id = gms.id ) ORDER BY games.last_activity DESC;
+			) ON ( games.gm_id = gms.id ) ORDER BY games.last_activity DESC
 		");
 		if(!$res) { // if there was an error
 			error_log("(Error #$mysqli->errno): $mysqli->error");
