@@ -22,33 +22,28 @@
 			break;
 		case "game": // this is the case for a user's list of games or a the forum for a game
 			if (isset($_GET["gameid"]) && $gameid = intval($_GET["gameid"]) > 0) {
+				require_once 'MySQLConnector.php';
 				$mysqli = get_mysql_connection();
 				$res = $mysqli->query("
-					SELECT COUNT(*)
+					SELECT COUNT(*) AS num_chars, games.name AS game_name
 					FROM characters
 					JOIN (
 						character_game_map
 						JOIN games ON ( games.id = $gameid
 						AND games.id = character_game_map.game_id)
 					) ON ( character_game_map.character_id = characters.id)
-					WHERE characters.user_id = " . $_SESSION["uid"]
+					WHERE characters.user_id = ${_SESSION["uid"]}"
 				);
 				if (!$res) { // if there was an error
 					error_log("(Error #$mysqli->errno): $mysqli->error");
 					die("(Error #$mysqli->errno): $mysqli->error");
 				}
-				$row = $res->fetch_row();
-				if ($row[0] > 0) {
-					$res = $mysqli->query("
-						SELECT characters.name AS char_name, users.username AS username,
-						posts.created AS posted, posts.content AS content
-						FROM users
-						JOIN (
-							characters JOIN posts
-							ON ( posts.game_id = $gameid  AND characters.id = posts.character_id)
-						) ON ( users.id = characters.user_id )
-						ORDER BY games.last_activity DESC
-					");
+				$row = $res->fetch_assoc();
+				if ($row["num_chars"] > 0) {
+					$GLOBALS["page_title"] = $row["game_name"];
+					$GLOBALS["create_page"] = "create_forum_body";
+					$GLOBALS["game_id"] = $gameid;
+					break;
 				}
 			} // we want to go to the games page if the gameid GET variable does not exist or is invalid
 		default: //includes "" so index.php will go here
@@ -116,7 +111,7 @@
 					character_game_map
 					JOIN (
 						characters
-						JOIN users ON ( users.id = " . $_SESSION["uid"] . "
+						JOIN users ON ( users.id = ${_SESSION["uid"]}
 						AND users.id = characters.user_id )
 					) ON ( characters.id = character_game_map.character_id )
 				) ON ( character_game_map.game_id = games.id )
@@ -140,10 +135,10 @@
 			// for all of the rows fetched from the database add a row to the HTML table
 			while ($row = $res->fetch_assoc()) {
 				println("<tr>", 4);
-				println("<td>" . $row["game_name"] . "</td>", 5);
-				println("<td>" . $row["char_name"] . "</td>", 5);
-				println("<td>" . $row["gm_name"] . "</td>", 5);
-				println("<td>" . $row["activity"] . "</td>", 5);
+				println("<td>${row["game_name"]}</td>", 5);
+				println("<td>${row["char_name"]}</td>", 5);
+				println("<td>${row["gm_name"]}</td>", 5);
+				println("<td>${row["activity"]}</td>", 5);
 				println("</tr>", 4);
 			}
 			println("</table>", 3);
@@ -160,7 +155,7 @@
 				character_game_map
 				RIGHT JOIN (
 					characters
-					JOIN users ON ( users.id = " . $_SESSION["uid"] . "
+					JOIN users ON ( users.id = ${_SESSION["uid"]}
 					AND users.id = characters.user_id )
 				) ON ( characters.id = character_game_map.character_id )
 			) ON ( character_game_map.game_id = games.id )
@@ -179,7 +174,7 @@
 			println("</tr>", 4);
 			while ($row = $res->fetch_assoc()) {
 				println("<tr>", 4);
-				println("<td>" . $row["name"] . "</td>", 5);
+				println("<td>${row["name"]}</td>", 5);
 				println("<td>" . ($row["game"] == NULL ? "None" : $row["game"]) . "</td>", 5);
 				println("</tr>", 4);
 			}
@@ -189,6 +184,50 @@
 	
 	function create_profile_body() {
 		println("Under construction...");
+	}
+	
+	function create_forum_body() {
+		require_once 'MySQLConnector.php';
+		$mysqli = get_mysql_connection();
+		$res = $mysqli->query("
+			SELECT characters.name AS char_name, users.username AS username,
+			posts.created AS posted, posts.content AS content
+			FROM users
+			JOIN (
+				characters JOIN posts
+				ON ( posts.game_id = ${GLOBALS["game_id"]}
+				AND characters.id = posts.character_id )
+			) ON ( users.id = characters.user_id )
+			ORDER BY posts.created
+		");
+		if (!$res) { // if there was an error
+			error_log("(Error #$mysqli->errno): $mysqli->error");
+			die("(Error #$mysqli->errno): $mysqli->error");
+		}
+		if ($res->num_rows < 1) {
+			println("<h3>No posts have been made on this game</h3>");
+		} else {
+			println("<table id=\"posts\">");
+			while ($row =$res->fetch_assoc()) {
+				println("<tr>", 4);
+				println("<td>", 5);
+				println("<h4>${row["char_name"]}</h4>", 6);
+				println("<p>${row["username"]}</p>", 6);
+				println("<p class=\"small\">Posted: ${row["posted"]}</p>");
+				println("</td>", 5);
+				println("<td>", 5);
+				foreach (parse_post_content($row["content"]) as $line) {
+					println("$line<br />", 6);
+				}
+				println("</td>", 5);
+				println("</tr>", 4);
+			}
+			println("</table>", 3);
+		}
+	}
+
+	function parse_post_content($str) {
+		return array("foobar");
 	}
 
 ?>

@@ -4,6 +4,7 @@
 	border-style: solid;
 	border-color: #FFBBAA;
 	display: inline-block;
+	width: 100%;
 }
 
 .err {
@@ -82,16 +83,45 @@ body > * {
 table.bordered {
 	border-collapse: collapse;
 	border: 2px solid black;
+	font-family: Tahoma, sans-serif;
+	text-align: center;
+	letter-spacing: 0.03em;
 }
 
-table.bordered > tr:first-child {
+table.bordered > tbody > tr:first-child {
 	border: 2px solid black;
 }
 
-table.bordered th, table.bordered td {
+table.bordered > tbody > tr > th, table.bordered > tbody > tr > td {
 	border: 1px solid black;
 	padding: 0.15em 0.5em;
-	text-align: center;
+}
+
+#posts {
+	padding: 0em;
+	margin: 0em;
 	font-family: Tahoma, sans-serif;
-	letter-spacing: 0.03em;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+#posts > tbody > tr > td {
+	border: 1px dotted #EEDDDD;
+	vertical-align: top;
+}
+
+#posts > tbody > tr > td:nth-child(1) {
+	width: 155px;
+}
+
+#posts > tbody > tr > td:nth-child(2) {
+	width: 100%;
+}
+
+#posts > tbody > tr:nth-child(odd) {
+	background-color: #FFF6EE;
+}
+
+#posts > tbody > tr:nth-child(even) {
+	background-color: #FFF9F6;
 }
