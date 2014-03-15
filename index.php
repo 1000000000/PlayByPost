@@ -101,8 +101,8 @@
 		require_once "MySQLConnector.php";
 		$mysqli = get_mysql_connection();
 		$res = $mysqli->query("
-			SELECT games.name AS game_name, characters.name AS char_name,
-			gms.name AS gm_name,
+			SELECT games.id AS id, games.name AS game_name,
+			characters.name AS char_name, gms.name AS gm_name,
 			DATE_FORMAT(games.last_activity, \"%M %d, %Y, %r\") AS activity
 			FROM characters AS gms
 			JOIN (
@@ -135,7 +135,8 @@
 			// for all of the rows fetched from the database add a row to the HTML table
 			while ($row = $res->fetch_assoc()) {
 				println("<tr>", 4);
-				println("<td>${row["game_name"]}</td>", 5);
+				// The game name will link to the game's forum page
+				println("<td><a href=\"index.php?action=game&gameid=${row["id"]}\">${row["game_name"]}</a></td>", 5);
 				println("<td>${row["char_name"]}</td>", 5);
 				println("<td>${row["gm_name"]}</td>", 5);
 				println("<td>${row["activity"]}</td>", 5);
@@ -149,7 +150,7 @@
 		require_once 'MySQLConnector.php';
 		$mysqli = get_mysql_connection();
 		$res = $mysqli->query("
-			SELECT characters.name AS name, games.name AS game
+			SELECT games.id AS id, characters.name AS name, games.name AS game
 			FROM games
 			RIGHT JOIN (
 				character_game_map
@@ -175,7 +176,9 @@
 			while ($row = $res->fetch_assoc()) {
 				println("<tr>", 4);
 				println("<td>${row["name"]}</td>", 5);
-				println("<td>" . ($row["game"] == NULL ? "None" : $row["game"]) . "</td>", 5);
+				// if the game is NULL (the character is not associated with a game)
+				// the games column will say "None" otherwise it will have a link to the game
+				println("<td>" . ($row["game"] == NULL ? "None" : "<a href=\"index.php?action=game&gameid=${row["id"]}\">${row["game"]}</a>") . "</td>", 5);
 				println("</tr>", 4);
 			}
 			println("</table>", 3);

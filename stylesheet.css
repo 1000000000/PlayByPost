@@ -111,10 +111,11 @@ table.bordered > tbody > tr > th, table.bordered > tbody > tr > td {
 }
 
 #posts > tbody > tr > td:nth-child(1) {
-	width: 155px;
+	width: 161px;
 }
 
 #posts > tbody > tr > td:nth-child(2) {
+	padding: 0.5em;
 	width: 100%;
 }
 
